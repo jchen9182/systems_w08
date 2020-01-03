@@ -13,7 +13,6 @@
 
 #define KEY 24602
 #define SEG_SIZE 200
-#define FILE_SIZE 500
 
 union semun {
   int val;                 /* Value for SETVAL */

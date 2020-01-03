@@ -13,58 +13,56 @@ void create_story() {
         union semun sem;
         sem.val = 1;
         semctl(semd, 0, SETVAL, sem);
-        printf("Semaphore Created...");
+        printf("Semaphore Created...\n");
     }
 
     int shmd;
     shmd = shmget(KEY, SEG_SIZE, IPC_CREAT | 0644);
     if (shmd < 0) printf("Error %d: %s\n", errno, strerror(errno));
-    else printf("Shared Memory Created...");
+    else printf("Shared Memory Created...\n");
 
     int file;
     file = open("story.txt", O_WRONLY | O_CREAT | O_EXCL | O_TRUNC, 0644);
     if (file < 0) printf("Error %d: %s\n", errno, strerror(errno));
-    else printf("File Created...");
+    else printf("File Created...\n");
 }
 
 void view_story() {
-    int text[FILE_SIZE];
+    printf("The Story So Far:\n");
 
-    int fileopen = open("story.txt", O_RDONLY);
-    if (fileopen < 0) printf("Error %d: %s\n", errno, strerror(errno));
+    FILE* fp;
+    fp = fopen("story.txt", "r");
 
-    int fileread = read(fileopen, &text, sizeof(text));
-    if (fileread < 0) printf("Error %d: %s\n", errno, strerror(errno));
-
-    for (int i = 0; i < FILE_SIZE; i++) {
-        printf("%s", text[i]);
+    char line[100];
+    while (fgets(line, 100, fp)) {
+        printf("%s\n", line);
     }
 }
 
 void remove_story() {
-    int semd, shmd;
-    int v, r;
-    struct sembuf sb;
+    printf("Trying To Get In...\n");
 
-    printf("Trying To Get In...");
+    int semd;
+    struct sembuf sb;
     semd = semget(KEY, 1, 0);
     sb.sem_num = 0;
     sb.sem_op = -1;
     semop(semd, &sb, 1);
 
+    int shmd;
+    int v, r;
     shmd = shmget(KEY, SEG_SIZE, 0644);
-
 
     view_story();
 
     shmctl(shmd, IPC_RMID, 0);
-    printf("Shared Memory Removed\n");
+    printf("Shared Memory Removed...\n");
 
     semctl(semd, IPC_RMID, 0);
-    printf("Semaphore Removed...");
+    printf("Semaphore Removed...\n");
 
     remove("story.txt");
-    printf("File Removed...");
+    printf("File Removed...\n");
 }
 
 int main(int argc, char* argv[]) {
