@@ -37,6 +37,8 @@ void view_story() {
     while (fgets(line, 100, fp)) {
         printf("%s\n", line);
     }
+    
+    fclose(fp);
 }
 
 void remove_story() {
